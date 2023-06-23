@@ -1,0 +1,114 @@
+<!-- index.html (frontend) -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PDF Data Extraction</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1>PDF Data Extraction</h1>
+        <form id="uploadPdfForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="filePdf">Upload PDF File:</label>
+                <input type="file" class="form-control-file" id="filePdf" name="filePdf">
+            </div>
+            <button type="submit" class="btn btn-primary">Extract Pdf Data</button>
+        </form>
+        <div id="resultPdf" class="mt-4"></div>
+    </div>
+
+    <div class="container mt-5">
+        <h1>Image Data Extraction</h1>
+        <form id="uploadImageForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="fileImage">Upload Image File:</label>
+                <input type="file" class="form-control-file" id="fileImage" name="fileImage" >
+            </div>
+            <button type="submit" class="btn btn-primary">Extract Image Data</button>
+        </form>
+        <div id="resultImage" class="mt-4"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#uploadPdfForm').submit(function (event) {
+                event.preventDefault();
+                var fileInput = $('#filePdf')[0];
+                var file = fileInput.files[0];
+
+                // Check if a file is selected and if it is a PDF file
+                if (file && file.type === 'application/pdf') {
+                    var formData = new FormData($(this)[0]);
+
+                    $.ajax({
+                        url: '/uploadPdf',
+                        type: 'POST',
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            // Display extracted data on the webpage
+                            var resultDiv = $('#resultPdf');
+                            resultDiv.empty();
+
+                            $.each(response, function (key, value) {
+                                resultDiv.append('<p><strong>' + key + ': </strong>' + value + '</p>');
+                            });
+                        },
+                        error: function (error) {
+                            console.log(error);
+                            $('#resultPdf').text('Error occurred. Please try again.');
+                        }
+                    });
+                } else {
+                    // Display an error message if no file is selected or it is not a PDF file
+                    $('#resultPdf').text('Please select a PDF file.');
+                }
+            })
+
+            $('#uploadImageForm').submit(function (event) {
+                event.preventDefault();
+                var fileInput = $('#fileImage')[0];
+                var file = fileInput.files[0];
+
+                //Check file type
+                // print(file.type);
+                if (file ) {
+                    var formData = new FormData($(this)[0]);
+
+                    $.ajax({
+                        url: '/uploadImage',
+                        type: 'POST',
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            // Display extracted data on the webpage
+                            var resultDiv = $('#resultImage');
+                            resultDiv.empty();
+
+                            $.each(response, function (key, value) {
+                                resultDiv.append('<p><strong>' + key + ': </strong>' + value + '</p>');
+                            });
+                        },
+                        error: function (error) {
+                            console.log(error);
+                            $('#resultImage').text('Error occurred. Please try again.');
+                        }
+                    });
+                } else {
+                    // Display an error message if no file is selected or it is not a PDF file
+                    $('#resultImage').text('Please select a Image file.');
+                }
+            })
+        });
+    </script>
+</body>
+
+</html>

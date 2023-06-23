@@ -1,0 +1,150 @@
+***********app.py***************
+
+The code is a Flask backend implementation that handles file uploads and data extraction for PDF and image files. Below is the documentation for the different endpoints and functionality of the page:
+
+POST /uploadPdf
+
+This endpoint handles the upload of a PDF file.
+Request: Accepts a file named 'filePdf' in the request form data.
+Response: Returns the extracted text data from the PDF file as a JSON response.
+
+
+POST /uploadImage
+
+This endpoint handles the upload of an image file (JPEG or PNG).
+Request: Accepts a file named 'fileImage' in the request form data.
+Response: Returns the extracted text data from the image file as a JSON response.
+
+
+GET /index
+
+This endpoint renders the homepage (index.html) using the provided HTML template.
+index.html
+
+This HTML template represents the frontend of the application.
+It displays a form to upload either a PDF file or an image file.
+On form submission, it makes an AJAX request to the corresponding backend endpoint (/uploadPdf or /uploadImage).
+The extracted text data is then displayed on the webpage.
+Overall, the application allows users to upload PDF or image files, extracts text data from the files using the pdfToImage and textExtract modules, and returns the extracted data as a JSON response.
+
+
+**************pdfToImage******************
+
+The code is a function pdfToImage(pdf_path) that converts a PDF file to an image. Here is the documentation for the function:
+
+Function: pdfToImage(pdf_path)
+This function takes the path of a PDF file as input and converts it into an image.
+
+Input:
+pdf_path (string): The path of the PDF file to be converted.
+
+Output:
+image_path (string): The relative path of the converted image file.
+Steps:
+
+Use the convert_from_path function from the pdf2image module to convert the PDF file to a list of images.
+Save the first image from the list as 'temp.jpg' in the JPEG format.
+Get the relative path of the saved image using the os.path.relpath function.
+Return the relative path of the converted image.
+Please note that the code provided assumes that the pdf2image module is installed and accessible. Make sure to install the necessary dependencies (pdf2image, poppler-utils, and Pillow) before using this function.
+
+
+
+**************textExtract**************
+
+The code includes a function extract_text_from_coordinates(image_path) that extracts text from specific coordinates in an image using OCR (Optical Character Recognition). Here is the documentation for the function:
+
+Function: extract_text_from_coordinates(image_path)
+This function takes the path of an image as input and extracts text from specified coordinates in the image.
+
+Input:
+image_path (string): The path of the image file from which text will be extracted.
+
+Output:
+extracted_text (list): A list of strings representing the extracted text from the specified coordinates.
+
+
+Steps:
+i) Read the image from the provided image_path using OpenCV's cv2.imread function.
+ii) Call the textMarker function from the textMarker module (assumed to be imported) to get the coordinates of the text regions of interest in the image. This function may also return an image, but it is not used in the current implementation.
+iii) Convert the image to grayscale using OpenCV's cv2.cvtColor function.
+iv) Iterate over each set of coordinates obtained from textMarker:
+        a) Extract the region of interest from the grayscale image using the coordinates.
+        b) Apply OCR using Pytesseract's image_to_string function to extract text from the region.
+        c) Append the extracted text to the extracted_text list.
+v) Return the extracted_text list containing the extracted text from each specified coordinate.
+
+
+
+************* textMarker.py *****************
+
+The code includes a function textMarker(image_path) that performs text detection and marking on an image using OCR (Optical Character Recognition). Here is the documentation for the function:
+
+Function: textMarker(image_path)
+This function takes the path of an image as input and performs text detection and marking on the image.
+
+Input:
+image_path (string): The path of the image file on which text detection will be performed.
+
+Output:
+text_coordinates (list): A list of tuples representing the coordinates of the detected text regions in the image.
+image (OpenCV image): The original image with text regions marked.
+
+Steps:
+1) Read the image from the provided image_path using OpenCV's cv2.imread function.
+2) Convert the image to grayscale using OpenCV's cv2.cvtColor function.
+3) Perform text detection using OCR (Tesseract) by calling pytesseract.image_to_data function on the grayscale image. The OCR engine configuration is set using the config variable.
+4) Process the text detection results:
+    i)Split the text into lines and skip the header line.
+    ii)Iterate over each line:
+        -Split the line into data elements.
+        -Extract the bounding box coordinates (x, y, width, height) and confidence level (conf).
+        -Filter out regions with low confidence or non-textual content.
+        -Draw rectangles on the original image to mark the text regions.
+        -Append the coordinates of the detected text region to the text_coordinates list.
+5) Return the text_coordinates list and the marked image.
+
+
+
+
+**************** templates/index.html *****************
+
+The code is an HTML file named `index.html` which contains a form for uploading PDF and image files and performing data extraction. Here is the documentation for the HTML page:
+
+**File: index.html**
+This HTML file contains a form for uploading PDF and image files and performing data extraction.
+
+- **Form for PDF File Upload:**
+  - Form ID: `uploadPdfForm`
+  - File Input ID: `filePdf`
+  - Submit Button: `Extract Pdf Data`
+  - Result Div ID: `resultPdf`
+
+- **Form for Image File Upload:**
+  - Form ID: `uploadImageForm`
+  - File Input ID: `fileImage`
+  - Submit Button: `Extract Image Data`
+  - Result Div ID: `resultImage`
+
+- **JavaScript:**
+  - The JavaScript code inside the `<script>` tag performs the following actions:
+    - It waits for the document to be ready using `$(document).ready` function.
+    - It attaches a submit event listener to the `uploadPdfForm` form.
+      - On form submission, it prevents the default form submission behavior using `event.preventDefault()`.
+      - It retrieves the selected file from the `filePdf` input element.
+      - If a file is selected and its type is `application/pdf`, it prepares the form data using `FormData` object.
+      - It sends an AJAX POST request to the `/uploadPdf` endpoint with the form data.
+      - On successful response, it displays the extracted data in the `resultPdf` div.
+      - On error, it logs the error message in the console and displays an error message in the `resultPdf` div.
+    - It attaches a submit event listener to the `uploadImageForm` form.
+      - On form submission, it prevents the default form submission behavior using `event.preventDefault()`.
+      - It retrieves the selected file from the `fileImage` input element.
+      - If a file is selected, it prepares the form data using `FormData` object.
+      - It sends an AJAX POST request to the `/uploadImage` endpoint with the form data.
+      - On successful response, it displays the extracted data in the `resultImage` div.
+      - On error, it logs the error message in the console and displays an error message in the `resultImage` div.
+
+- **External Dependencies:**
+  - Bootstrap CSS: The page uses Bootstrap CSS for styling. It includes the Bootstrap CSS file from the CDN (Content Delivery Network) using the `<link>` tag.
+
+This HTML file assumes that the dependencies (jQuery, Bootstrap) are available and properly linked.
