@@ -32,14 +32,14 @@ The project relies on the following dependencies:
    git clone https://github.com/your-username/pdf-image-data-extraction.git
 
 2. Install the Python dependencies:
-  
-  ```bash
-  pip install -r requirements.txt
+
+   ```bash
+   pip install -r requirements.txt
 
 3. Run the Flask web application:
 
-  ```bash
-  python app.py
+   ```bash
+   python app.py
 
 
 ## Usage
